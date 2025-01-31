@@ -5,36 +5,41 @@ using UnityEngine;
 public class CarController : MonoBehaviour
 {
     [SerializeField] private Rigidbody _rb;
-    [SerializeField] private float _speed;
-    [SerializeField] private float _maxSpeed;
-    [SerializeField] private float _rotationSpeed;
-    [SerializeField] private float _acceleration;
-    private float _;
-
+    [SerializeField] private float _maxSpeed, _rotationSpeed, _acceleration, _rotationInput;
+    private float _speed, _accelerationInterpolator;
+    private bool _isAccelerating;
+    [SerializeField] private AnimationCurve _accelerationCurve, _decelerationCurve;
     void FixedUpdate()
     {
-        if(Input.GetButton("Jump"))
+        if (_isAccelerating)
+        { 
+            _accelerationInterpolator += _acceleration;
+        }
+        else
         {
-            _acceleration = Mathf.Clamp(_acceleration +);
-        } 
+            _accelerationInterpolator -= _decelerationCurve.Evaluate(_accelerationInterpolator)* _acceleration; 
+        }
+        transform.eulerAngles+= Vector3.up * (_rotationSpeed*Time.fixedDeltaTime * _rotationInput);
+        _accelerationInterpolator = Mathf.Clamp01(_accelerationInterpolator);
+        _speed = _accelerationCurve.Evaluate(_accelerationInterpolator)*_maxSpeed;
         _rb.MovePosition(transform.position + transform.forward * (_speed * Time.fixedDeltaTime));
     }
     void Update()
     {
-        if(Input.GetAxisRaw("Horizontal")>0)
+        if(Input.GetKeyDown(KeyCode.Space))
         {
-            transform.eulerAngles+= Vector3.up * (_rotationSpeed*Time.deltaTime);
-        } 
-        if(Input.GetAxisRaw("Horizontal")<0)
+            _isAccelerating = true;
+        }
+
+        if (Input.GetKeyUp(KeyCode.Space))
         {
-            transform.eulerAngles+= Vector3.down * (_rotationSpeed*Time.deltaTime);        
-        }   
-        
+            _isAccelerating = false;
+        }
+        _rotationInput = Input.GetAxis("Horizontal");
+         
         var xAngle = Mathf.Clamp(transform.eulerAngles.x+360, 320f, 400f);
         var yAngle = transform.eulerAngles.y;
         var zAngle = 0f;
         transform.eulerAngles = new Vector3(xAngle, yAngle, zAngle);
-        _speed = Mathf.Lerp(_acceleration, Time.deltaTime, _acceleration*Time.deltaTime);
-        _speed = Mathf.Clamp(_speed+_acceleration, 0, _maxSpeed);
     }
 }
