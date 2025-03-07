@@ -8,32 +8,18 @@ public class CarController : MonoBehaviour
 {
     [SerializeField] private Rigidbody _rb;
     [Header("Speed Settings")]
-    [SerializeField] private float _baseMaxSpeed, _maxSpeed, _rotationSpeed, _acceleration, _rotationInput;
+    [SerializeField] private float _baseMaxSpeed, _speedMaxTurbo, _rotationSpeed, _acceleration, _rotationInput, _boostDuration;
     private float _speed, _accelerationInterpolator;
-    private bool _isAccelerating;
-    public bool IsBoosting;
+    private bool _isAccelerating, _isBoosting;
     [SerializeField] private AnimationCurve _accelerationCurve, _decelerationCurve;
     [Header("Terrain Modification")]
     private float _terrainSpeedVariator;
     [SerializeField] private float _raycastDistance;
     [SerializeField] private LayerMask _layerMask;
     
-    private void Start()
-    {
-        _baseMaxSpeed = _maxSpeed;
-    }
-
-    public void ResetMaxSpeed()
-    {
-        _maxSpeed = _baseMaxSpeed;
-    }
-    public void SetMaxSpeed(float newMaxSpeed)
-    {
-        _maxSpeed = newMaxSpeed;
-    }
     private void FixedUpdate()
     {
-        if (_isAccelerating || IsBoosting)
+        if (_isAccelerating)
         { 
             _accelerationInterpolator += _acceleration;
         }
@@ -41,15 +27,26 @@ public class CarController : MonoBehaviour
         {
             _accelerationInterpolator -= _decelerationCurve.Evaluate(_accelerationInterpolator)* _acceleration; 
         }
-        transform.eulerAngles+= Vector3.up * (_rotationSpeed*Time.fixedDeltaTime * _rotationInput);
+        
         _accelerationInterpolator = Mathf.Clamp01(_accelerationInterpolator);
-        _speed = _accelerationCurve.Evaluate(_accelerationInterpolator)*_maxSpeed;
+        
+        if(_isBoosting)
+        {
+            _speed = _speedMaxTurbo;
+        }
+        else
+        {
+            _speed = _accelerationCurve.Evaluate(_accelerationInterpolator)*_baseMaxSpeed*_terrainSpeedVariator;
+        }
+        
+        transform.eulerAngles+= Vector3.up * (_rotationSpeed*Time.fixedDeltaTime * _rotationInput);
         _rb.MovePosition(transform.position + transform.forward * (_terrainSpeedVariator* _speed * Time.fixedDeltaTime));
     }
+    
     void Update()
     {
         TerrainModifier();
-        Debug.Log(" transform.eulerAngles.x : " + transform.eulerAngles.x);
+       // Debug.Log(" transform.eulerAngles.x : " + transform.eulerAngles.x);
         
         if(Input.GetKeyDown(KeyCode.Space))
         {
@@ -82,9 +79,23 @@ public class CarController : MonoBehaviour
             _terrainSpeedVariator = 1;
         }
     }
-    //
-    private void BalanceVehicle()
+    public void Turbo()
+    {
+        if (!_isBoosting)
+        {
+            StartCoroutine(Turboroutine());
+        }
+    }
+
+    private IEnumerator Turboroutine()
+    {
+        _isBoosting = true;
+        yield return new WaitForSeconds(_boostDuration);
+        _isBoosting = false;
+    }
+    
+    /*private void BalanceVehicle()
     {
         transform.Rotate()
-    }
+    }*/
 }
