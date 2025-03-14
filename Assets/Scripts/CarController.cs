@@ -6,6 +6,8 @@ using UnityEngine;
 
 public class CarController : MonoBehaviour
 {
+    [Header("Inputs")]
+    [SerializeField] private float _accelerationInput, _steeringInput, _boostInput;
     [SerializeField] private Rigidbody _rb;
     [Header("Speed Settings")]
     [SerializeField] private float _baseMaxSpeed, _speedMaxTurbo, _rotationSpeed, _acceleration, _rotationInput, _boostDuration;
