@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 7826471262522999688}
   - component: {fileID: 2016313328134576176}
   - component: {fileID: 3517915906981365364}
+  - component: {fileID: 3173088866965054740}
   m_Layer: 0
   m_Name: pouet pouet
   m_TagString: Player
@@ -129,7 +130,6 @@ MonoBehaviour:
   _itemList:
   - {fileID: 11400000, guid: 4e8e815c01c9a3543932d9a33743be23, type: 2}
   - {fileID: 11400000, guid: f46d217e5f4dd764bb95d22bb096ffc0, type: 2}
-  - {fileID: 11400000, guid: 5ee6075059b76884a869638a8846f93c, type: 2}
   _currentItem: {fileID: 0}
   _itemImage: {fileID: 0}
   _numberOfItemUse: 0
@@ -235,3 +235,20 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.9320824, y: 0.39423826, z: 1.4633954}
   m_Center: {x: 0.010307655, y: 0.19800682, z: 0.0644539}
+--- !u!114 &3173088866965054740
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5671376079840958116}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33c61b8d7f2e1894fa6703ce77223e24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _totalFlags: 7
+  _laps: 0
+  _totalLaps: 3
+  _flagsList: []
+  _lapsText: {fileID: 0}
