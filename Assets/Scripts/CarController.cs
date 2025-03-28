@@ -1,13 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Cinemachine;
 using UnityEngine;
 
 public class CarController : MonoBehaviour
 {
     [Header("Inputs")]
-    [SerializeField] private float _accelerationInput, _steeringInput, _boostInput;
+    [SerializeField] private string _accelerationInput = "Accelerate", _steeringInput = "Horizontal";
     [SerializeField] private Rigidbody _rb;
     [Header("Speed Settings")]
     [SerializeField] private float _baseMaxSpeed, _speedMaxTurbo, _rotationSpeed, _acceleration, _rotationInput, _boostDuration;
@@ -15,9 +14,9 @@ public class CarController : MonoBehaviour
     private bool _isAccelerating, _isBoosting;
     [SerializeField] private AnimationCurve _accelerationCurve, _decelerationCurve;
     [Header("Terrain Modification")]
-    private float _terrainSpeedVariator;
+    [SerializeField] private float _terrainSpeedVariator;
     [SerializeField] private float _raycastDistance;
-    [SerializeField] private LayerMask _layerMask;
+    [SerializeField] private LayerMask _outerTerrainMask, _boostTerrainMask;
     
     private void FixedUpdate()
     {
@@ -48,32 +47,27 @@ public class CarController : MonoBehaviour
     void Update()
     {
         TerrainModifier();
-       // Debug.Log(" transform.eulerAngles.x : " + transform.eulerAngles.x);
-        
-        if(Input.GetKeyDown(KeyCode.Space))
+        OnBoostingPad();
+        if(Input.GetButtonDown(_accelerationInput))
         {
             _isAccelerating = true;
         }
 
-        if (Input.GetKeyUp(KeyCode.Space))
+        if (Input.GetButtonUp(_accelerationInput))
         {
             _isAccelerating = false;
         }
-        _rotationInput = Input.GetAxis("Horizontal");
+        _rotationInput = Input.GetAxis(_steeringInput);
     }
     // Gere la vitesse en fonction du terrain touché
     private void TerrainModifier()
     {
-        if (Physics.Raycast(transform.position, transform.up * -1, out var info, _raycastDistance, _layerMask))
+        if (Physics.Raycast(transform.position, transform.up * -1, out var info, _raycastDistance, _outerTerrainMask))
         {
-            Terrain terrainBellow = info.transform.GetComponent<Terrain>();
+            Terrains terrainBellow = info.transform.GetComponent<Terrains>();
             if (terrainBellow != null)
             {
                 _terrainSpeedVariator = terrainBellow.SpeedVariator;
-            }
-            else
-            {
-                _terrainSpeedVariator = 1;
             }
         }
         else
@@ -95,9 +89,12 @@ public class CarController : MonoBehaviour
         yield return new WaitForSeconds(_boostDuration);
         _isBoosting = false;
     }
-    
-    /*private void BalanceVehicle()
+
+    private void OnBoostingPad()
     {
-        transform.Rotate()
-    }*/
+        if (Physics.Raycast(transform.position, transform.up * -1, 0.1f, _boostTerrainMask))
+        {
+            Turbo();
+        }
+    }
 }

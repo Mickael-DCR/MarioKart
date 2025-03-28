@@ -10,13 +10,14 @@ public class PlayerItemManager : MonoBehaviour
 {
     [SerializeField] private List<Item> _itemList;
     [SerializeField] private Item _currentItem;
+    [SerializeField] private string _itemInput = "UseItem";
     [SerializeField] private Image _itemImage;
     [SerializeField] private int  _numberOfItemUse;
     public CarController CarController;
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.LeftShift))
+        if (Input.GetButtonDown(_itemInput))
         {
             UseItem();
         }
