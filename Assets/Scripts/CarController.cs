@@ -17,47 +17,74 @@ public class CarController : MonoBehaviour
     [SerializeField] private float _terrainSpeedVariator;
     [SerializeField] private float _raycastDistance;
     [SerializeField] private LayerMask _outerTerrainMask, _boostTerrainMask;
+
+    public bool IsHindered;
+    public bool IsInvincible;
     
+    [Header("RocketStart")]
+    [SerializeField] private RocketStart _rocketStart;
+    private float _rocketStartTime;
+    
+
     private void FixedUpdate()
     {
-        if (_isAccelerating)
-        { 
-            _accelerationInterpolator += _acceleration;
+        if (!_rocketStart.GameStarted)
+        {
         }
         else
         {
-            _accelerationInterpolator -= _decelerationCurve.Evaluate(_accelerationInterpolator)* _acceleration; 
-        }
+            if (!_rocketStart.IsRocketStartDone && _rocketStartTime is <= 2 and > 0)
+            {
+                Turbo();
+                _rocketStart.IsRocketStartDone = true;
+            }
+            if (IsInvincible || _isAccelerating && !IsHindered)
+            { 
+                _accelerationInterpolator += _acceleration;
+            }
+            else
+            {
+                _accelerationInterpolator -= _decelerationCurve.Evaluate(_accelerationInterpolator)* _acceleration; 
+            }
         
-        _accelerationInterpolator = Mathf.Clamp01(_accelerationInterpolator);
+            _accelerationInterpolator = Mathf.Clamp01(_accelerationInterpolator);
         
-        if(_isBoosting)
-        {
-            _speed = _speedMaxTurbo;
-        }
-        else
-        {
-            _speed = _accelerationCurve.Evaluate(_accelerationInterpolator)*_baseMaxSpeed*_terrainSpeedVariator;
-        }
+            if(_isBoosting)
+            {
+                _speed = _speedMaxTurbo;
+            }
+            else
+            {
+                _speed = _accelerationCurve.Evaluate(_accelerationInterpolator)*_baseMaxSpeed*_terrainSpeedVariator;
+            }
         
-        transform.eulerAngles+= Vector3.up * (_rotationSpeed*Time.fixedDeltaTime * _rotationInput);
-        _rb.MovePosition(transform.position + transform.forward * (_terrainSpeedVariator* _speed * Time.fixedDeltaTime));
+            transform.eulerAngles+= Vector3.up * (_rotationSpeed*Time.fixedDeltaTime * _rotationInput);
+            _rb.MovePosition(transform.position + transform.forward * (_terrainSpeedVariator* _speed * Time.fixedDeltaTime));
+        }
     }
     
     void Update()
     {
-        TerrainModifier();
-        OnBoostingPad();
-        if(Input.GetButtonDown(_accelerationInput))
+        if (_rocketStart.CountDownRunning && Input.GetButton(_accelerationInput))
         {
-            _isAccelerating = true;
+            _rocketStartTime += Time.deltaTime;
+            Debug.Log(_rocketStartTime);
         }
+        else
+        {
+            TerrainModifier();
+            OnBoostingPad();
+            if(Input.GetButtonDown(_accelerationInput))
+            {
+                _isAccelerating = true;
+            }
 
-        if (Input.GetButtonUp(_accelerationInput))
-        {
-            _isAccelerating = false;
+            if (Input.GetButtonUp(_accelerationInput))
+            {
+                _isAccelerating = false;
+            }
+            _rotationInput = Input.GetAxis(_steeringInput);
         }
-        _rotationInput = Input.GetAxis(_steeringInput);
     }
     // Gere la vitesse en fonction du terrain touché
     private void TerrainModifier()
@@ -97,4 +124,6 @@ public class CarController : MonoBehaviour
             Turbo();
         }
     }
+    
+    
 }

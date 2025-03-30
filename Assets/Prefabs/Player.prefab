@@ -224,6 +224,7 @@ MonoBehaviour:
   _boostTerrainMask:
     serializedVersion: 2
     m_Bits: 64
+  IsHindered: 0
 --- !u!65 &3517915906981365364
 BoxCollider:
   m_ObjectHideFlags: 0

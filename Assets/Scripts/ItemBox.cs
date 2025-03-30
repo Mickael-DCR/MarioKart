@@ -27,6 +27,5 @@ public class ItemBox : MonoBehaviour
         yield return new WaitForSeconds(_waitBeforeRespawn);
         _collider.enabled = true;
         _meshRenderer.enabled = true;
-
     }
 }

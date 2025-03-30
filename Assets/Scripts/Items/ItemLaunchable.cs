@@ -5,9 +5,9 @@ using UnityEngine;
 [CreateAssetMenu (fileName = "ItemLaunchable", menuName = "Items/Item Launchable")]
 public class ItemLaunchable : Item
 {
-    public GameObject ItemPrefab;
+    [SerializeField] private GameObject _itemPrefab;
     public override void Activation(PlayerItemManager player)
     {
-        Instantiate(ItemPrefab, player.transform.position, player.transform.rotation);
+        Instantiate(_itemPrefab, player.transform.position+player.transform.forward*-2+player.transform.up*0.25f, player.transform.rotation);
     }
 }
